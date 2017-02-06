@@ -1,0 +1,12 @@
+[submodule "rm3-codes"]
+	path = rm3-codes
+	url = git@github.com:jtomaszk/smart-home-broadlink-rm3-codes.git
+[submodule "python-broadlink"]
+	path = python-broadlink
+	url = git@github.com:mjg59/python-broadlink.git
+[submodule "node-pioneer-avr"]
+	path = node-pioneer-avr
+	url = git@github.com:stormboy/node-pioneer-avr.git
+[submodule "pioneer"]
+	path = pioneer
+	url = git@github.com:jtomaszk/smart-home-pioneer.git
