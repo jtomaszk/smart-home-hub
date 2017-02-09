@@ -10,3 +10,9 @@
 [submodule "pioneer"]
 	path = pioneer
 	url = git@github.com:jtomaszk/smart-home-pioneer.git
+[submodule "py-lg-tv-control"]
+	path = py-lg-tv-control
+	url = https://github.com/simonjmckenna/py-lg-tv-control.git
+[submodule "pioneer_python_cli"]
+	path = pioneer_python_cli
+	url = https://github.com/turibe/pioneer_python_cli.git

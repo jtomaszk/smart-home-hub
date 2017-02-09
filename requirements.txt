@@ -1,0 +1,18 @@
+appdirs==1.4.0
+-e git+https://github.com/mjg59/python-broadlink.git@7a852b20840aab131ba59aaf85f5e67831b7ccc3#egg=broadlink
+Cerberus==0.9.2
+click==6.7
+Eve==0.7
+Events==0.2.2
+Flask==0.12
+Flask-PyMongo==0.4.1
+itsdangerous==0.24
+Jinja2==2.9.5
+MarkupSafe==0.23
+packaging==16.8
+pycrypto==2.6.1
+pymongo==3.4.0
+pyparsing==2.1.10
+simplejson==3.10.0
+six==1.10.0
+Werkzeug==0.11.14
