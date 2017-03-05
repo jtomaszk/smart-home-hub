@@ -1,6 +1,10 @@
 import broadlink
 import time, os, sys, traceback
 
+from pioneer_python_cli.telnet import Connection
+from pioneer_python_cli.telnet import ReadThread
+
+
 from eve import Eve
 from flask import jsonify
 from eve_swagger import swagger, add_documentation
@@ -23,9 +27,6 @@ app.config['SWAGGER_INFO'] = {
     }
 }
 
-# optional. Will use flask.request.host if missing.
-#app.config['SWAGGER_HOST'] = '192.168.1.50'
-
 add_documentation({'paths': {'/play' : {'get': {'parameters': [
     {
         'code_name': 'string'
@@ -35,6 +36,25 @@ add_documentation({'paths': {'/play' : {'get': {'parameters': [
 host_addr = "192.168.1.51"
 host_mac = "34ea34e7d239"
 file_dir = "rm3-codes/"
+
+#@app.route('/app', methods=['GET'])
+#def index():
+#    return app.send_static_file('index.html')
+
+HOST = "192.168.1.52"
+c = Connection(HOST)
+
+readThread = ReadThread(c)
+readThread.daemon = True
+readThread.start()
+
+@app.route('/send/<command>', methods=['GET'])
+def send(command):
+    r = c.run_command(command)
+    if r is not None and r.ok and r.status == "read":
+        r = c.read_response(1)
+    return jsonify(r)
+
 
 @app.route('/play/<path:code_name>', methods=['GET'])
 def play_code(code_name):
@@ -58,6 +78,26 @@ def play_code(code_name):
         return jsonify(ok=False, msg="Error on read file " + file_path)
 
 
+@app.route('/list', methods=['GET'])
+def list():
+    d = dict()
+    for root, dirs, files in os.walk(file_dir):
+        for file in files:
+            if file.endswith(".hex"):
+                file_path = os.path.join(root, file)
+                dirname = os.path.dirname(file_path)
+                d.setdefault(dirname[len(file_dir):], []).append(file[:-4])
+    return jsonify(ok=True, list=d)
+
+def mkdirs(file_path):
+    if not os.path.exists(os.path.dirname(file_path)):
+        try:
+            os.makedirs(os.path.dirname(file_path))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+
 @app.route('/record/<path:code_name>', methods=['GET'])
 def record_code(code_name):
     try:
@@ -76,13 +116,7 @@ def record_code(code_name):
             myhex = str(ir_packet).encode('hex');
 
             file_path = file_dir + code_name + '.hex'
-
-            if not os.path.exists(os.path.dirname(file_path)):
-                try:
-                    os.makedirs(os.path.dirname(file_path))
-                except OSError as exc: # Guard against race condition
-                    if exc.errno != errno.EEXIST:
-                        raise
+            mkdirs(file_path)
 
             with open(file_path, 'w') as f:
                 f.write(myhex)
